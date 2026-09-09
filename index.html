@@ -4,14 +4,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pinterest Clone</title>
+<title>Pinterest Clone Pro</title>
 
 <style>
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
@@ -58,11 +58,6 @@ nav{
     border-radius:30px;
     cursor:pointer;
     font-weight:bold;
-    transition:.3s;
-}
-
-.upload-btn:hover{
-    background:#c4001d;
 }
 
 .profile{
@@ -71,12 +66,12 @@ nav{
     border-radius:50%;
     background:#ddd;
     display:flex;
-    justify-content:center;
     align-items:center;
+    justify-content:center;
     font-weight:bold;
 }
 
-/* Masonry Layout */
+/* Gallery */
 .gallery{
     column-count:4;
     column-gap:15px;
@@ -86,27 +81,51 @@ nav{
 .card{
     break-inside:avoid;
     margin-bottom:15px;
-    position:relative;
-    overflow:hidden;
-    border-radius:18px;
     background:white;
-    cursor:pointer;
-    transition:.3s;
+    border-radius:18px;
+    overflow:hidden;
     box-shadow:0 3px 10px rgba(0,0,0,.08);
+    transition:.3s;
 }
 
 .card:hover{
-    transform:translateY(-5px);
+    transform:translateY(-4px);
 }
 
 .card img{
     width:100%;
     display:block;
+    cursor:pointer;
 }
 
-.card .title{
-    padding:12px;
+.title{
+    padding:12px 12px 5px;
     font-weight:bold;
+}
+
+.description{
+    padding:0 12px 10px;
+    color:#666;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.actions{
+    padding:0 12px 12px;
+}
+
+.download-btn{
+    display:inline-block;
+    text-decoration:none;
+    background:#e60023;
+    color:white;
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:14px;
+}
+
+.download-btn:hover{
+    background:#c4001d;
 }
 
 /* Modal */
@@ -169,7 +188,7 @@ nav{
     <div class="logo">Pinterest</div>
 
     <div class="search-box">
-        <input type="text" id="search" placeholder="Cari gambar...">
+        <input type="text" id="search" placeholder="Cari gambar atau deskripsi...">
     </div>
 
     <label class="upload-btn">
@@ -182,65 +201,68 @@ nav{
 
 <div class="gallery" id="gallery"></div>
 
-<!-- Modal -->
 <div class="modal" id="modal">
     <span class="close">&times;</span>
     <img id="modalImg" class="modal-content">
 </div>
 
 <script>
+
 const images = [
 {
 title:"Nature",
+description:"Pemandangan alam hijau yang menenangkan.",
 url:"https://picsum.photos/400/600?random=1"
 },
 {
 title:"Mountain",
+description:"Pegunungan tinggi dengan panorama indah.",
 url:"https://picsum.photos/400/500?random=2"
 },
 {
 title:"Travel",
+description:"Inspirasi perjalanan ke berbagai tempat menarik.",
 url:"https://picsum.photos/400/700?random=3"
 },
 {
 title:"Food",
+description:"Kuliner lezat dan menggugah selera.",
 url:"https://picsum.photos/400/550?random=4"
 },
 {
-title:"City",
-url:"https://picsum.photos/400/650?random=5"
-},
-{
 title:"Beach",
-url:"https://picsum.photos/400/500?random=6"
-},
-{
-title:"Art",
-url:"https://picsum.photos/400/700?random=7"
-},
-{
-title:"Design",
-url:"https://picsum.photos/400/550?random=8"
+description:"Pantai eksotis dengan pasir putih.",
+url:"https://picsum.photos/400/650?random=5"
 }
 ];
 
 const gallery = document.getElementById("gallery");
 
 function renderGallery(data){
+
     gallery.innerHTML = "";
 
     data.forEach(item=>{
+
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
             <img src="${item.url}" alt="${item.title}">
             <div class="title">${item.title}</div>
+            <div class="description">${item.description}</div>
+            <div class="actions">
+                <a href="${item.url}"
+                   download="${item.title}"
+                   class="download-btn">
+                   Download
+                </a>
+            </div>
         `;
 
-        card.addEventListener("click",()=>{
-            modal.style.display = "flex";
-            modalImg.src = item.url;
+        card.querySelector("img").addEventListener("click",()=>{
+            modal.style.display="flex";
+            modalImg.src=item.url;
         });
 
         gallery.appendChild(card);
@@ -257,12 +279,18 @@ document.getElementById("uploadImage")
 
     if(!file) return;
 
+    const desc = prompt(
+        "Masukkan deskripsi gambar:",
+        "Foto yang diupload pengguna"
+    );
+
     const reader = new FileReader();
 
     reader.onload = function(event){
 
         images.unshift({
             title:file.name,
+            description:desc || "Tidak ada deskripsi.",
             url:event.target.result
         });
 
@@ -274,12 +302,13 @@ document.getElementById("uploadImage")
 
 /* Search */
 document.getElementById("search")
-.addEventListener("keyup", e=>{
+.addEventListener("keyup", function(){
 
-    const keyword = e.target.value.toLowerCase();
+    const keyword = this.value.toLowerCase();
 
     const filtered = images.filter(item =>
-        item.title.toLowerCase().includes(keyword)
+        item.title.toLowerCase().includes(keyword) ||
+        item.description.toLowerCase().includes(keyword)
     );
 
     renderGallery(filtered);
@@ -290,14 +319,15 @@ const modal = document.getElementById("modal");
 const modalImg = document.getElementById("modalImg");
 
 document.querySelector(".close").onclick = ()=>{
-    modal.style.display = "none";
+    modal.style.display="none";
 };
 
 modal.onclick = (e)=>{
     if(e.target === modal){
-        modal.style.display = "none";
+        modal.style.display="none";
     }
 };
+
 </script>
 
 </body>
