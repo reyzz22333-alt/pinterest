@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,7 +26,7 @@ nav{
     background:white;
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    gap:15px;
     padding:12px 20px;
     box-shadow:0 2px 10px rgba(0,0,0,.1);
 }
@@ -38,7 +39,6 @@ nav{
 
 .search-box{
     flex:1;
-    margin:0 20px;
 }
 
 .search-box input{
@@ -49,6 +49,20 @@ nav{
     background:#efefef;
     outline:none;
     font-size:16px;
+}
+
+.upload-btn{
+    background:#e60023;
+    color:white;
+    padding:10px 18px;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.upload-btn:hover{
+    background:#c4001d;
 }
 
 .profile{
@@ -78,6 +92,7 @@ nav{
     background:white;
     cursor:pointer;
     transition:.3s;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
 }
 
 .card:hover{
@@ -90,7 +105,7 @@ nav{
 }
 
 .card .title{
-    padding:10px;
+    padding:12px;
     font-weight:bold;
 }
 
@@ -98,7 +113,7 @@ nav{
 .modal{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.8);
+    background:rgba(0,0,0,.85);
     display:none;
     justify-content:center;
     align-items:center;
@@ -116,7 +131,7 @@ nav{
     top:20px;
     right:30px;
     color:white;
-    font-size:35px;
+    font-size:40px;
     cursor:pointer;
 }
 
@@ -139,12 +154,11 @@ nav{
 
     nav{
         flex-wrap:wrap;
-        gap:10px;
     }
 
     .search-box{
-        margin:0;
         width:100%;
+        order:3;
     }
 }
 </style>
@@ -157,6 +171,11 @@ nav{
     <div class="search-box">
         <input type="text" id="search" placeholder="Cari gambar...">
     </div>
+
+    <label class="upload-btn">
+        + Tambah Foto
+        <input type="file" id="uploadImage" accept="image/*" hidden>
+    </label>
 
     <div class="profile">R</div>
 </nav>
@@ -171,54 +190,38 @@ nav{
 
 <script>
 const images = [
-    {
-        title:"Nature",
-        url:"https://picsum.photos/400/600?random=1"
-    },
-    {
-        title:"Mountain",
-        url:"https://picsum.photos/400/500?random=2"
-    },
-    {
-        title:"Travel",
-        url:"https://picsum.photos/400/700?random=3"
-    },
-    {
-        title:"Food",
-        url:"https://picsum.photos/400/550?random=4"
-    },
-    {
-        title:"City",
-        url:"https://picsum.photos/400/650?random=5"
-    },
-    {
-        title:"Beach",
-        url:"https://picsum.photos/400/500?random=6"
-    },
-    {
-        title:"Art",
-        url:"https://picsum.photos/400/700?random=7"
-    },
-    {
-        title:"Design",
-        url:"https://picsum.photos/400/550?random=8"
-    },
-    {
-        title:"Fashion",
-        url:"https://picsum.photos/400/600?random=9"
-    },
-    {
-        title:"Animals",
-        url:"https://picsum.photos/400/650?random=10"
-    },
-    {
-        title:"Technology",
-        url:"https://picsum.photos/400/500?random=11"
-    },
-    {
-        title:"Gaming",
-        url:"https://picsum.photos/400/700?random=12"
-    }
+{
+title:"Nature",
+url:"https://picsum.photos/400/600?random=1"
+},
+{
+title:"Mountain",
+url:"https://picsum.photos/400/500?random=2"
+},
+{
+title:"Travel",
+url:"https://picsum.photos/400/700?random=3"
+},
+{
+title:"Food",
+url:"https://picsum.photos/400/550?random=4"
+},
+{
+title:"City",
+url:"https://picsum.photos/400/650?random=5"
+},
+{
+title:"Beach",
+url:"https://picsum.photos/400/500?random=6"
+},
+{
+title:"Art",
+url:"https://picsum.photos/400/700?random=7"
+},
+{
+title:"Design",
+url:"https://picsum.photos/400/550?random=8"
+}
 ];
 
 const gallery = document.getElementById("gallery");
@@ -236,8 +239,8 @@ function renderGallery(data){
         `;
 
         card.addEventListener("click",()=>{
-            document.getElementById("modal").style.display="flex";
-            document.getElementById("modalImg").src=item.url;
+            modal.style.display = "flex";
+            modalImg.src = item.url;
         });
 
         gallery.appendChild(card);
@@ -246,8 +249,33 @@ function renderGallery(data){
 
 renderGallery(images);
 
-// Search
-document.getElementById("search").addEventListener("keyup", e=>{
+/* Upload Foto */
+document.getElementById("uploadImage")
+.addEventListener("change", function(e){
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+
+        images.unshift({
+            title:file.name,
+            url:event.target.result
+        });
+
+        renderGallery(images);
+    };
+
+    reader.readAsDataURL(file);
+});
+
+/* Search */
+document.getElementById("search")
+.addEventListener("keyup", e=>{
+
     const keyword = e.target.value.toLowerCase();
 
     const filtered = images.filter(item =>
@@ -257,8 +285,9 @@ document.getElementById("search").addEventListener("keyup", e=>{
     renderGallery(filtered);
 });
 
-// Modal close
+/* Modal */
 const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
 
 document.querySelector(".close").onclick = ()=>{
     modal.style.display = "none";
@@ -273,3 +302,4 @@ modal.onclick = (e)=>{
 
 </body>
 </html>
+```
